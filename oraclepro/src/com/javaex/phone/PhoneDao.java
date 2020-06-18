@@ -36,7 +36,7 @@ public class PhoneDao {
 
 				// 2. Connection 얻어오기	 --암호 세팅	
 				conn = DriverManager.getConnection(url, id, pw); // 쿼리로 만들기
-				System.out.println("접속 성공"); 	
+				//System.out.println("접속 성공"); 	
 					
 				}catch  (ClassNotFoundException e) {
 					System.out.println("error: 드라이버 로딩 실패 - " + e);
@@ -73,7 +73,7 @@ public class PhoneDao {
 				String query = ""; // 쿼리문 문자열만들기, ? 주의
 				query += " INSERT INTO person ";
 				query += " VALUES (seq_person_id.nextval, ?, ?, ?) ";
-				System.out.println(query);
+				//System.out.println(query);
 				
 				pstmt = conn.prepareStatement(query); // 쿼리로 만들기
 				
@@ -84,7 +84,7 @@ public class PhoneDao {
 				int count = pstmt.executeUpdate(); // 쿼리문 실행
 
 				// 4.결과처리
-				System.out.println(count + "건 처리되었습니다.");
+				//System.out.println(count + "건 처리되었습니다.");
 				
 			} catch (SQLException e) {
 				System.out.println("error:" + e);
@@ -119,7 +119,7 @@ public class PhoneDao {
 				int count = pstmt.executeUpdate(); // 쿼리문 실행
 
 				// 4.결과처리
-				System.out.println(count + "건 처리되었습니다.");
+				//System.out.println(count + "건 처리되었습니다.");
 
 			} catch (SQLException e) {
 				System.out.println("error:" + e);
@@ -148,7 +148,7 @@ public class PhoneDao {
 
 				// 4.결과처리
 				
-					System.out.println(count + "건 처리되었습니다.");
+					//System.out.println(count + "건 처리되었습니다.");
 		
 			} catch (SQLException e) {
 			System.out.println("error:" + e);
@@ -156,7 +156,59 @@ public class PhoneDao {
 			//자원 정리
 			close();
 		}
+	
 		
+		public List<PersonVo> searchPersonList() {
+			//리스트 준비
+			List<PersonVo> searchPersonList = new ArrayList<PersonVo>();
+			
+			//connection
+			getConnect();
+			
+			try {
+				
+				// 3. SQL문 준비 / 바인딩 / 실행  --> 완성된 sql문을 가져와서 작성할것
+				String query = "";
+				query += " select	name, ";
+				query += "			hp, ";
+				query += "			company ";
+				query += " from person";
+				query += " where name like '%' + keyword + '%'";
+				query += " and  hp like '%' + keyword + '%'";
+				query += " and  company like '%' + keyword + '%'";
+				
+				System.out.println(query);
+				
+				pstmt = conn.prepareStatement(query); //쿼리로 만들기
+						
+				rs = pstmt.executeQuery(); //실행
+				
+				// 4.결과처리
+				while(rs.next()) {
+					
+					int personId = rs.getInt("person_id");
+					String name = rs.getString("name");
+					String hp = rs.getString("hp");
+					String company = rs.getString("company");
+					
+					//리스트에 추가
+					PersonVo personVo = new PersonVo(personId, name, hp, company);
+					searchPersonList.add(personVo);
+					
+					//System.out.println(authorId + "\t" + authorName + "\t" + authorDesc);
+				}
+
+			} catch (SQLException e) {
+			System.out.println("error:" + e);
+			}
+			//자원정리
+			close();
+		
+			return searchPersonList;
+			
+	}
+	
+	
 	public List<PersonVo> getPersonList() {
 		//리스트 준비
 		List<PersonVo> personList = new ArrayList<PersonVo>();
